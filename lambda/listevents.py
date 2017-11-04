@@ -89,7 +89,7 @@ def get_list_events(intent, session):
 
     events = [
         FunEvent("Rubber duck race", date.today(), 10),
-        FunEvent("Arch Enemy concert", date.today(), 25)
+        FunEvent("Metallica concert", date.today(), 25)
     ]
     
     if len(events) == 0:
@@ -124,7 +124,7 @@ def select_event(intent, session):
 
     events = [
         FunEvent("Rubber duck race", date.today(), 10),
-        FunEvent("Arch Enemy concert", date.today(), 25)
+        FunEvent("Metallica concert", date.today(), 25)
     ]
 
     if 'event' in intent['slots']:
