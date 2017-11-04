@@ -2,6 +2,7 @@ import smtplib
 import time
 import imaplib
 import email
+import sys
 
 from runConsumerOWP import run_consumer
 
@@ -25,6 +26,7 @@ def read_email_from_gmail():
         latest_email_id = int(id_list[-1])
 
         while True:
+            mail.select('inbox')
             previous_latest_email_id = latest_email_id
             
             type, data = mail.search(None, 'ALL')
@@ -33,6 +35,9 @@ def read_email_from_gmail():
             id_list = mail_ids.split()   
             first_email_id = int(id_list[0])
             latest_email_id = int(id_list[-1])
+            # print 'first: ' + str(first_email_id)
+            # print 'latest: ' + str(latest_email_id)
+            print 'ids: ' + str(id_list)
             
             if previous_latest_email_id != latest_email_id:
                 typ, data = mail.fetch(latest_email_id, '(RFC822)' )
@@ -45,10 +50,11 @@ def read_email_from_gmail():
                         print 'From : ' + email_from + '\n'
                         print 'Subject : ' + email_subject + '\n'
 
-                        if 'funpay' in email_subject:
-                            event_price = msg.get_payload().split()[0]
+                        if 'funpay' in email_subject.lower():
+                            event_name = msg.get_payload().split('\n')[0]
+                            print "will purchase " + event_name
+                            run_consumer(event_name)
 
-                                
             time.sleep(5)
 
     except Exception, e:
