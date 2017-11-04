@@ -9,6 +9,7 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 from datetime import date
+import boto3
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -159,6 +160,22 @@ def pay_for_event_in_session(intent, session):
         evprice = session['attributes']['event_price']
 
         # PAY HERE
+        client = boto3.client('sns')
+        response = client.publish(
+            TopicArn='arn:aws:sns:eu-west-1:701544423913:FunPayTopic',
+            # TargetArn='string',
+            # PhoneNumber='string',
+            Message=str(evprice),
+            Subject='funpay'
+            # MessageStructure='string',
+            # MessageAttributes={
+            #     'string': {
+            #     'DataType': 'string',
+            #     'StringValue': 'string',
+            #     'BinaryValue': b'bytes'
+            #     }
+            # }
+        )
 
         speech_output = "You bought tickets for " + evname + \
                 ". You were charged " + str(evprice) + " pounds." + \
