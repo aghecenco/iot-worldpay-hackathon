@@ -165,7 +165,7 @@ def pay_for_event_in_session(intent, session):
             TopicArn='arn:aws:sns:eu-west-1:701544423913:FunPayTopic',
             # TargetArn='string',
             # PhoneNumber='string',
-            Message=str(evprice),
+            Message=str(evname),
             Subject='funpay'
             # MessageStructure='string',
             # MessageAttributes={
