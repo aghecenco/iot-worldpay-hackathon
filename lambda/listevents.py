@@ -121,9 +121,20 @@ def select_event(intent, session):
     session_attributes = {}
     should_end_session = False
 
+    events = [
+        FunEvent("Rubber duck race", date.today(), 10),
+        FunEvent("Arch Enemy concert", date.today(), 25)
+    ]
+
     if 'event' in intent['slots']:
         evname = intent['slots']['event']['value']
-        session_attributes = create_event_attributes(evname)
+        evprice = 0
+        for ev in events:
+            if ev.name.lower() == evname.lower():
+                evprice = ev.price
+        if evprice == 0:
+            evprice = 15
+        session_attributes = create_event_attributes(evname, evprice)
         speech_output = "You want to attend " + \
                         evname + \
                         ". You can ask me to purchase tickets by saying " \
@@ -134,7 +145,7 @@ def select_event(intent, session):
         speech_output = "I'm not sure what event you picked. " \
                         "Please try again."
         reprompt_text = "I'm not sure what event you picked. " \
-                        "You can tell me your favorite color by saying, " \
+                        "You can tell me what event to pick by saying, " \
                         "Get tickets for event."
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
