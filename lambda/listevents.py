@@ -8,7 +8,7 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
-
+from datetime import date
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -50,13 +50,11 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "Welcome to the Alexa Skills Kit sample. " \
-                    "Please tell me your favorite color by saying, " \
-                    "my favorite color is red"
+    speech_output = "Welcome to the Alexa Anti Boredom kit. " \
+                    "What are your plans for tonight?"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Please tell me your favorite color by saying, " \
-                    "my favorite color is red."
+    reprompt_text = "What are your plans for tonight?"
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -64,58 +62,98 @@ def get_welcome_response():
 
 def handle_session_end_request():
     card_title = "Session Ended"
-    speech_output = "Thank you for trying the Alexa Skills Kit sample. " \
-                    "Have a nice day! "
+    speech_output = "Thank you for fighting boredom with Alexa. " \
+                    "Have fun! "
     # Setting this to true ends the session and exits the skill.
     should_end_session = True
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
 
-def create_favorite_color_attributes(favorite_color):
-    return {"favoriteColor": favorite_color}
+def create_event_attributes(evname, evprice):
+    return {"event_name": evname, "event_price": evprice}
 
+class FunEvent: 
+    def __init__(self, name, date, price):
+        self.name = name
+        self.date = date
+        self.price = price
 
-def set_color_in_session(intent, session):
-    """ Sets the color in the session and prepares the speech to reply to the
-    user.
-    """
+    def __str__(self):
+        return self.name + " on " + str(self.date) + ", tickets cost " + str(self.price) + " pounds"
 
+def get_list_events(intent, session):
+    session_attributes = {}
+    reprompt_text = None
+
+    events = [
+        FunEvent("Rubber duck race", date.today(), 10),
+        FunEvent("Arch Enemy concert", date.today(), 25)
+    ]
+    
+    if len(events) == 0:
+        speech_output = "Sorry, looks like nothing's going on."
+        should_end_session = True
+    else:
+        speech_output = "Here's what's happening: " + ", ".join(events)
+        should_end_session = False
+    
+    return build_response(session_attributes, build_speechlet_response(
+        intent['name'], speech_output, reprompt_text, should_end_session))
+
+def select_event(intent, session):
+    # "request": {
+    # "type": "IntentRequest",
+    # "requestId": "EdwRequestId.ac909ff5-e943-4a4b-b288-e9e68b077eb5",
+    # "intent": {
+    #   "name": "SelectEventIntent",
+    #   "slots": {
+    #     "event": {
+    #       "name": "event",
+    #       "value": "rubber duck race"
+    #     }
+    #   }
+    # },
+    # "locale": "en-US",
+    # "timestamp": "2017-11-04T12:26:05Z"
+    # }
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
 
-    if 'Color' in intent['slots']:
-        favorite_color = intent['slots']['Color']['value']
-        session_attributes = create_favorite_color_attributes(favorite_color)
-        speech_output = "I now know your favorite color is " + \
-                        favorite_color + \
-                        ". You can ask me your favorite color by saying, " \
-                        "what's my favorite color?"
-        reprompt_text = "You can ask me your favorite color by saying, " \
-                        "what's my favorite color?"
+    if 'event' in intent['slots']:
+        evname = intent['slots']['event']['value']
+        session_attributes = create_event_attributes(evname)
+        speech_output = "You want to attend " + \
+                        evname + \
+                        ". You can ask me to purchase tickets by saying " \
+                        "Pay with FunPay"
+        reprompt_text = "You can ask me to purchase tickets by saying " \
+                        "Pay with FunPay"
     else:
-        speech_output = "I'm not sure what your favorite color is. " \
+        speech_output = "I'm not sure what event you picked. " \
                         "Please try again."
-        reprompt_text = "I'm not sure what your favorite color is. " \
+        reprompt_text = "I'm not sure what event you picked. " \
                         "You can tell me your favorite color by saying, " \
-                        "my favorite color is red."
+                        "Get tickets for event."
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
-
-def get_color_from_session(intent, session):
+def pay_for_event_in_session(intent, session):
     session_attributes = {}
     reprompt_text = None
 
-    if session.get('attributes', {}) and "favoriteColor" in session.get('attributes', {}):
-        favorite_color = session['attributes']['favoriteColor']
-        speech_output = "Your favorite color is " + favorite_color + \
-                        ". Goodbye."
+    if session.get('attributes', {}) and "event_name" in session.get('attributes', {}) and "event_price" in session.get('attributes', {}):
+        evname = session['attributes']['event_name']
+        evprice = session['attributes']['event_price']
+        speech_output = "You want to purchase tickets for " + evname + \
+                        ". You will be charged " + str(evprice) + "."
+
+        # PAY HERE
+
         should_end_session = True
     else:
-        speech_output = "I'm not sure what your favorite color is. " \
-                        "You can say, my favorite color is red."
+        speech_output = "I'm not sure what event you picked."
         should_end_session = False
 
     # Setting reprompt_text to None signifies that we do not want to reprompt
@@ -124,14 +162,6 @@ def get_color_from_session(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
 
-def handle_pay_for_event(intent, session):
-    session_attributes = {}
-    reprompt_text = None
-    speech_output = "You paid for the event."
-    should_end_session = True
-
-    # do stuff with worldpay
-    return build_response(session_attributes, build_speechlet_response(intent['name'], speech_output, reprompt_text, should_end_session))
 
 # --------------- Events ------------------
 
@@ -163,13 +193,12 @@ def on_intent(intent_request, session):
     intent_name = intent_request['intent']['name']
 
     # Dispatch to your skill's intent handlers
-    # if intent_name == "MyColorIsIntent":
-    #     return set_color_in_session(intent, session)
-    # elif intent_name == "WhatsMyColorIntent":
-    #     return get_color_from_session(intent, session)
-    
-    if intent_name == "PayForEventIntent":
-        return handle_pay_for_event(intent, session)
+    if intent_name == "AskListEventIntent":
+        return get_list_events(intent, session)
+    elif intent_name == "SelectEventIntent":
+        return select_event(intent, session)
+    elif intent_name == "PayForEventIntent":
+        return pay_for_event_in_session(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
