@@ -151,7 +151,7 @@ def run():
         # [ CLIENT KEY, SERVICE KEY] : From online.worldpay.com
         wpw.initProducer(config.pspConfig())
         wpw.addService(svc)
-        broadcastDuration = 20000
+        broadcastDuration = 500000
         durationSeconds = broadcastDuration / 1000
         wpw.startServiceBroadcast(broadcastDuration) #20000
         repeat = 0

@@ -137,7 +137,7 @@ def signal_handler(signum, frame):
         wpw.stopRPCAgent()
     sys.exit(0)
 
-def run():
+def run_consumer(event_name):
     # catch term/int signals
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -172,12 +172,17 @@ def run():
                             if svcPrices != None:
                                 #onlyRunOnce3 = 0
                                 for svcPrice in svcPrices:
+                                    print "#" + svcPrice.getDescription().lower().strip() + "#"
+                                    print "#" + event_name.lower().strip() + "#"
+                                    if svcPrice.getDescription().lower().strip() == event_name.lower().strip():
                                     #onlyRunOnce3 = onlyRunOnce3 + 1
                                     #Select the first price in the list
-                                    tpr = getServicePriceQuote(svcDetail.getServiceId(), 1, svcPrice.getId())
-                                    print 'Client ID: {0}\n'.format(tpr.getClientId())
-                                    print 'Server ID: {0}\n'.format(tpr.getServerId())
-                                    paymentResponse = purchaseService(svcDetail.getServiceId(), tpr)
+                                        tpr = getServicePriceQuote(svcDetail.getServiceId(), 1, svcPrice.getId())
+                                        print 'Client ID: {0}\n'.format(tpr.getClientId())
+                                        print 'Server ID: {0}\n'.format(tpr.getServerId())
+                                        paymentResponse = purchaseService(svcDetail.getServiceId(), tpr)
+                                    else:
+                                        print "Skipping " + svcPrice.getDescription()
                                 #if onlyRunOnce3 != 0:
                                 #    break
                         #if onlyRunOnce2 != 0:
@@ -191,4 +196,4 @@ def run():
         print "WPWithinGeneralException caught:", wpge
     except Exception as exc:
         print "Exception caught:", exc
-run()
+# run()
