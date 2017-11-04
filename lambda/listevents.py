@@ -95,7 +95,7 @@ def get_list_events(intent, session):
         speech_output = "Sorry, looks like nothing's going on."
         should_end_session = True
     else:
-        speech_output = "Here's what's happening: " + ", ".join(events)
+        speech_output = "Here's what's happening: " + ", ".join([str(e) for e in events])
         should_end_session = False
     
     return build_response(session_attributes, build_speechlet_response(
@@ -157,10 +157,12 @@ def pay_for_event_in_session(intent, session):
     if session.get('attributes', {}) and "event_name" in session.get('attributes', {}) and "event_price" in session.get('attributes', {}):
         evname = session['attributes']['event_name']
         evprice = session['attributes']['event_price']
-        speech_output = "You want to purchase tickets for " + evname + \
-                        ". You will be charged " + str(evprice) + "."
 
         # PAY HERE
+
+        speech_output = "You bought tickets for " + evname + \
+                ". You were charged " + str(evprice) + " pounds." + \
+                " Thank you for using WorldPay Within."
 
         should_end_session = True
     else:
