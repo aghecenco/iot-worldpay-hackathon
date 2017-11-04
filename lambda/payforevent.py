@@ -124,6 +124,14 @@ def get_color_from_session(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
 
+def handle_pay_for_event(intent, session):
+    session_attributes = {}
+    reprompt_text = None
+    speech_output = "You paid for the event."
+    should_end_session = True
+
+    # do stuff with worldpay
+    return build_response(session_attributes, build_speechlet_response(intent['name'], speech_output, reprompt_text, should_end_session))
 
 # --------------- Events ------------------
 
@@ -155,10 +163,13 @@ def on_intent(intent_request, session):
     intent_name = intent_request['intent']['name']
 
     # Dispatch to your skill's intent handlers
-    if intent_name == "MyColorIsIntent":
-        return set_color_in_session(intent, session)
-    elif intent_name == "WhatsMyColorIntent":
-        return get_color_from_session(intent, session)
+    # if intent_name == "MyColorIsIntent":
+    #     return set_color_in_session(intent, session)
+    # elif intent_name == "WhatsMyColorIntent":
+    #     return get_color_from_session(intent, session)
+    
+    if intent_name == "PayForEventIntent":
+        return handle_pay_for_event(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
