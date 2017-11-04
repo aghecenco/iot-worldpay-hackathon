@@ -1,0 +1,19 @@
+{
+  "host": "127.0.0.1",
+  "port": 8778,
+  "hceCard": {
+    "firstName": "Joe",
+    "lastName": "Bloggs",
+    "expMonth": 12,
+    "expYear": 2020,
+    "cardNumber": "3434343434343434",
+    "type": "Card",
+    "cvc": "123"
+  },
+  "pspConfig": {
+    "psp_name": "securenet",
+    "api_endpoint": "https://gwapi.demo.securenet.com/api/",
+    "developer_id": "12345678",
+    "app_version": "0.1"
+  }
+}

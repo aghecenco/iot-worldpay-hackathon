@@ -1,0 +1,103 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Worldpay Within Producer Dashboard - powered by Worldpay IoT Payments</title>
+    <link rel="stylesheet" href="css/foundation.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans" rel="stylesheet">
+
+
+    <script src="js/jquery-2.1.4.js"></script>
+    <script src="js/vendor/what-input.js"></script>
+    <script src="js/vendor/foundation.js"></script>
+    <script src="js/app.js"></script>
+
+  </head>
+  <body class="mainBgColorRed fullBodyFont">
+
+
+    <div class="row">
+      <div class="large-10 columns">
+          &nbsp;
+      </div>
+      <div class="large-10 columns"><a href="index.html">
+          <img class="floatImageLeft smallerImage" src="./images/smart-car-small.png" />
+          <h1 class="h1Styled">The Worldpay Within Producer Dashboard</h1></a>
+      </div>      
+      <div class="large-2 columns paddingTop paddingBottom">
+        <img src="./images/white-worldpay-logo.png" />
+      </div>
+    </div>
+
+
+
+ 
+
+
+ <div class="row">     
+      <div class="large-12 columns">
+
+
+<div id="outputProducerStatus"></div>          
+
+
+
+
+
+
+
+
+ 
+
+<script>
+
+  function doGetScannedDevicesStatus() {
+    callDeviceScannerJson(); 
+  }
+
+  function callDeviceScannerJson() {
+        var jsonString = "../device-scanner.json?timefactor=" + (new Date());
+        console.log(jsonString);
+        $.getJSON(jsonString, function(json) {
+            console.log("Outputting device scanner json: " + json); // this will show the info it in firebug debugConsole
+            obj = json;
+            outputDeviceScannerJson(obj);
+        });
+  }
+
+  function outputDeviceScannerJson(obj) {
+      statusHtml = "<table><tbody>"
+      for(i=0; i<obj.length; i++) {
+          statusHtml += "<tr>";
+          statusHtml += "<td>" + obj[i].devicename + "</td>";
+          statusHtml += "<td>" + obj[i].devicedescription + "</td>";
+          statusHtml += "<td>" + obj[i].serverid + "</td>";
+          statusHtml += "<td>" + obj[i].hostname + "</td>";
+          statusHtml += "<td>" + obj[i].portnumber + "</td>";
+          statusHtml += "<td>" + obj[i].urlprefix + "</td>";
+          statusHtml += "<td>Services: " + obj[i].numberofservices + "</td>";
+          statusHtml += "</tr>";
+      }
+
+      document.getElementById('outputProducerStatus').innerHTML = statusHtml;              
+
+  }
+
+  doGetScannedDevicesStatus();
+  var scannedDevicesTimer = setInterval(doGetScannedDevicesStatus, 550 * 2);
+
+
+
+
+            
+
+</script>
+
+
+
+
+  </body>
+</html>
