@@ -12,10 +12,14 @@ def discoverDevices(): # throws WPWithinGeneralException {
 
     global wpw
     devices = []
-    oneSvcMsg = wpw.searchForDevice(8000, "FunPay")
+    oneSvcMsg = wpw.searchForDevice(20000, "FunPay")
+    print "found something"
+    print oneSvcMsg.getDeviceName()
     if oneSvcMsg != None and oneSvcMsg.getDeviceName() != "":
+        print oneSvcMsg.getDeviceName()
         devices.append(oneSvcMsg)
     #devices = wpw.deviceDiscovery(8000)
+
 
     if devices != None and len(devices) > 0:
         print "{0} services found:\n".format(len(devices))
@@ -133,7 +137,7 @@ def signal_handler(signum, frame):
         wpw.stopRPCAgent()
     sys.exit(0)
 
-def run_consumer(service_name):
+def run():
     # catch term/int signals
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -187,3 +191,4 @@ def run_consumer(service_name):
         print "WPWithinGeneralException caught:", wpge
     except Exception as exc:
         print "Exception caught:", exc
+run()

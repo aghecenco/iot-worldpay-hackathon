@@ -87,6 +87,31 @@ def signal_handler(signum, frame):
         wpw.stopRPCAgent()
     sys.exit(0)
 
+def parse_prices(fname):
+    ret = {}
+    with open(fname) as f:
+        content = f.readlines()
+        i = 0
+        while i < len(content):
+            line = content[i]
+            if line.startswith('id'):
+                ccPrice = WWTypes.WWPrice()
+                ccPrice.setId(int(line.split()[1]))
+                ccPrice.setDescription(" ".join(content[i+1].split()[1:]))
+                ccPrice.setUnitDescription(content[i+2].split()[1])
+                ccPrice.setUnitId(int(content[i+3].split()[1]))
+                price = int(content[i+4].split()[1])
+                
+                ppu = WWTypes.WWPricePerUnit()
+                ppu.setAmount(price)
+                ppu.setCurrencyCode("GBP")
+                ccPrice.setPricePerUnit(ppu)
+
+                ret[ccPrice.getId()] = ccPrice
+                #print str(price) + " : " + str(ccPrice.getId()) + " " + ccPrice.getDescription() + " " + ccPrice.getUnitDescription() + " " + str(ccPrice.getUnitId())
+            i = i + 5
+    return ret
+
 def run():
     try:
         # catch term/int signals
@@ -112,21 +137,21 @@ def run():
         svc.setId(1)
         svc.setServiceType("FunPay")
         ccPrice = WWTypes.WWPrice()
- #       ccPrice.setId(1)
- #       ccPrice.setDescription("event")
- #       ccPrice.setUnitDescription("One event")
- #       ccPrice.setUnitId(1)
+        ccPrice.setId(1)
+        ccPrice.setDescription("event")
+        ccPrice.setUnitDescription("One event")
+        ccPrice.setUnitId(1)
         ppu = WWTypes.WWPricePerUnit()
-        ppu.setAmount(1000)
+        ppu.setAmount(100)
         ppu.setCurrencyCode("GBP")
         ccPrice.setPricePerUnit(ppu)
         prices = {}
         prices[ccPrice.getId()] = ccPrice
-        svc.setPrices(prices)
+        svc.setPrices(parse_prices("events.txt"))
         # [ CLIENT KEY, SERVICE KEY] : From online.worldpay.com
         wpw.initProducer(config.pspConfig())
         wpw.addService(svc)
-        broadcastDuration = 99999999999
+        broadcastDuration = 20000
         durationSeconds = broadcastDuration / 1000
         wpw.startServiceBroadcast(broadcastDuration) #20000
         repeat = 0
